@@ -117,7 +117,12 @@ const gameTiles: GameQuestion[] = [
 
 const questionTypes = Object.values(QuestionType);
 
-function GameBoard() {
+interface GameBoardProps {
+    onSelectQuestion: (question: GameQuestion) => void;
+}
+
+function GameBoard({ onSelectQuestion }: GameBoardProps) {
+
     return (
         <Box sx={{width: '100em', display: 'flex', flexWrap: 'nowrap', gap: 2, overflowX: 'auto' }}>
         {questionTypes.map((questionType: QuestionType) => (
@@ -139,7 +144,7 @@ function GameBoard() {
                     <TableRow
                     key={`${row.questionType}-${row.value}`}
                     >
-                        <TableCell component="th" scope="row" sx={{textAlign: 'center', fontSize: '4em'}}>
+                        <TableCell component="th" scope="row" sx={{textAlign: 'center', fontSize: '4em', cursor: 'pointer'}} onClick={()=>onSelectQuestion(row)}>
                             ${row.value}
                         </TableCell>
                     </TableRow>

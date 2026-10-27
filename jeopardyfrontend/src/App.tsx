@@ -3,7 +3,7 @@ import connection from './singalRConnection';
 import './App';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Home from './pages/Home'
+import Game from './pages/Game'
 
 function App() {
     return (
@@ -15,7 +15,7 @@ function App() {
                 justifyContent: 'center',
             }}
         >
-            <Home/>
+            <Game/>
         </Box>
         
     );

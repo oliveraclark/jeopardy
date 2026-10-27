@@ -1,7 +1,7 @@
 export enum QuestionType {
-    History = 'history',
-    Geography = 'geography',
-    Film = 'film',
+    History = 'History',
+    Geography = 'Geography',
+    Film = 'Film',
 }
 
 export interface GameQuestion {
