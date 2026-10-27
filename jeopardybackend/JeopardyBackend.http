@@ -1,0 +1,6 @@
+@jeopardybackend_hostAddress = http://localhost:5139
+
+# GET {{jeopardybackend_hostAddress}}/weatherforecast/
+# Accept: application/json
+
+###
