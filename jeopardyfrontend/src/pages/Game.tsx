@@ -3,6 +3,8 @@ import Button from '@mui/material/Button';
 import GameBoard from '../componants/common/GameBoard';
 import QuestionDialogue from '../componants/common/QuestionDialogue';
 import { GameQuestion } from "../types/game.types";
+import { gameTiles } from '../utils/questionUtils';
+
 
 function Game() {
 
@@ -10,7 +12,7 @@ function Game() {
 
     return (
         <div>
-            <GameBoard onSelectQuestion={setSelectedQuestion} />
+            <GameBoard questions={gameTiles} onSelectQuestion={setSelectedQuestion} />
             {selectedQuestion !== null && (
                 <QuestionDialogue
                     selectedTile={selectedQuestion}
