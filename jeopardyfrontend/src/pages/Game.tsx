@@ -15,7 +15,7 @@ function Game() {
                 <QuestionDialogue
                     selectedTile={selectedQuestion}
                     open={true}
-                    onClose={() => setSelectedQuestion(null)}
+                    setSelectedTile={setSelectedQuestion}
                 />
             )}
         </div>

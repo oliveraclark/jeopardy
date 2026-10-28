@@ -12,9 +12,9 @@ function createGameTile(
     questionType: QuestionType,
     value: number,
     hint: string,
-    answer: string
+    answer: string,
 ): GameQuestion {
-    return { questionType, value, hint, answer };
+    return { questionType, value, hint, answer, answered: false };
 };
 
 const gameTiles: GameQuestion[] = [
@@ -144,7 +144,22 @@ function GameBoard({ onSelectQuestion }: GameBoardProps) {
                     <TableRow
                     key={`${row.questionType}-${row.value}`}
                     >
-                        <TableCell component="th" scope="row" sx={{textAlign: 'center', fontSize: '4em', cursor: 'pointer'}} onClick={()=>onSelectQuestion(row)}>
+                        <TableCell
+                            component="th"
+                            scope="row"
+                            sx={{
+                                textAlign: 'center',
+                                fontSize: '4em',
+                                cursor: row.answered ? 'default' : 'pointer',
+                                color: row.answered ? 'grey.600' : 'inherit',
+                                bgcolor: row.answered ? 'grey.300' : 'inherit',
+                            }}
+                            onClick={() => {
+                                if (!row.answered) {
+                                    onSelectQuestion(row);
+                                }
+                            }}
+                        >
                             ${row.value}
                         </TableCell>
                     </TableRow>

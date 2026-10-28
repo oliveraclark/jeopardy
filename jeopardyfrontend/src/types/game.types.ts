@@ -9,4 +9,5 @@ export interface GameQuestion {
     value: number;
     hint: string;
     answer: string;
+    answered: boolean
 }
