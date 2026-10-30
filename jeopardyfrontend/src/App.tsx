@@ -4,19 +4,15 @@ import './App';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Game from './pages/Game'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
     return (
-        <Box
-            sx={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}
-        >
-            <Game/>
-        </Box>
+        <BrowserRouter>
+        <Routes>
+            <Route path='/game' element={<Game/>}/>
+        </Routes>
+        </BrowserRouter>
         
     );
 }
