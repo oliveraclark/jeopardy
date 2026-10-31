@@ -1,6 +1,7 @@
 import { Box } from "@mui/material"
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { PinInput } from "../components/base/input/pin-input";
+import { Button } from "@mui/material";
 
 function Home() {
     return (
@@ -23,6 +24,7 @@ function Home() {
                     </PinInput.Group>
                     <PinInput.Description>Ask your host for a code</PinInput.Description>
                 </PinInput>
+                <Button sx={{alignSelf: 'flex-end', mt: 2}} variant="contained">Create Game</Button>
             </Box>
         </Box>
 
