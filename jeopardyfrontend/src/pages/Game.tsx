@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import GameBoard from '../componants/common/GameBoard';
-import QuestionDialogue from '../componants/common/QuestionDialogue';
+import GameBoard from '../components/common/GameBoard';
+import QuestionDialogue from '../components/common/QuestionDialogue';
 import { GameQuestion } from "../types/game.types";
 import { gameTiles } from '../data/question.data';
 import { Box } from '@mui/material';
 import { dummyUsers } from '../data/contestants.data';
 import { Contestant } from '../data/contestants.data';
-import Leaderboard from '../componants/common/Leaderboard';
+import Leaderboard from '../components/common/Leaderboard';
 
 
 function Game() {
@@ -15,9 +15,9 @@ function Game() {
     const [contestants, setContestants] = useState(dummyUsers)
     const [gameQuestions, setGameQuestions] = useState(gameTiles)
 
-    function updateContestantScore(contestant: Contestant, score: number, answeredQuestion: GameQuestion) {
+    function updateGameState(contestant: Contestant, score: number, answeredQuestion: GameQuestion) {
         const newContestants = contestants.map((c: Contestant) => {
-            if(c.id == contestant.id) {
+            if(c.id === contestant.id) {
                 return {
                     ...c,
                     score: c.score + score,
@@ -32,7 +32,7 @@ function Game() {
 
         if(score > 0) {
             const newQuestions = gameQuestions.map((q: GameQuestion) => {
-                if(q.value == answeredQuestion.value && q.questionType == answeredQuestion.questionType) {
+                if(q.value === answeredQuestion.value && q.questionType === answeredQuestion.questionType) {
                     return {
                         ...q,
                         answered: true
@@ -46,14 +46,16 @@ function Game() {
     }
 
     return (
+        
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 10, justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+            <title>Jeoprady!</title>
             <Leaderboard contestants={contestants} />
             <GameBoard questions={gameQuestions} onSelectQuestion={setSelectedQuestion} />
             {selectedQuestion !== null && (
                 <QuestionDialogue
                     question={selectedQuestion}
                     setQuestion={setSelectedQuestion}
-                    onSubmit={updateContestantScore}
+                    onSubmit={updateGameState}
                     contestants={contestants}
 
                 />
