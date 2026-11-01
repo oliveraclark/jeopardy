@@ -29,4 +29,18 @@ public class GameRepository : IGameRepository
             _games.Add(game.Id, game);
         }
     }
+
+    public bool AddContestant(Game game, Contestant contestant)
+    {
+        lock (_games)
+        {
+            if (!_games.TryGetValue(game.Id, out var existingGame))
+                return false;
+
+            if (existingGame.Contestants.All(existing => existing.Id != contestant.Id))
+                existingGame.Contestants.Add(contestant);
+
+            return true;
+        }
+    }
 }

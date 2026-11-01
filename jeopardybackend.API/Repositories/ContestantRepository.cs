@@ -30,12 +30,11 @@ public class ContestantRepository : IContestantRepository
         }
     }
 
-    public Contestant GetContestant(Guid id)
+    public Contestant? GetContestant(Guid id)
     {
         lock (_contestants)
         {
-            return _contestants.Values.FirstOrDefault(c => c.Id == id)
-                ?? throw new KeyNotFoundException($"Contestant with ID '{id}' was not found.");
+            return _contestants.GetValueOrDefault(id);
         }
     }
 }

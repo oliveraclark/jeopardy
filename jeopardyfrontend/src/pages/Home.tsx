@@ -5,6 +5,7 @@ import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { createGame, joinGame } from "../services/gameService";
+import { createContestant } from "../services/userService";
 import { TextField } from "@mui/material";
 
 function Home() {
@@ -32,7 +33,8 @@ function Home() {
         if (gamePin.length !== 4) return;
 
         try {
-            const game = await joinGame(gamePin);
+            const response = await createContestant({ name });
+            const game = await joinGame(gamePin, response.id);
 
             navigate(`/game/${game.pin}`, {
                 state: {

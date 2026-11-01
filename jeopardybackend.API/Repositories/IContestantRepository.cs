@@ -2,7 +2,7 @@ namespace Jeopardy.API.Models;
 
 public interface IContestantRepository
 {
-    Contestant GetContestant(Guid id);
+    Contestant? GetContestant(Guid id);
 
     void Add(Contestant contestant);
 

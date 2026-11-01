@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Jeopardy.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/contestants")]
     public class ContestantController: ControllerBase
     {
         private readonly ContestantService _contestantService;

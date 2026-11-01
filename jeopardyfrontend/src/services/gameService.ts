@@ -23,13 +23,13 @@ export async function createGame(): Promise<CreateGameResponse> {
     return response.json();
 }
 
-export async function joinGame(pin: string): Promise<JoinGameResponse> {
+export async function joinGame(pin: string, contestantId: string): Promise<JoinGameResponse> {
     const response = await fetch(`${API_URL}/games/join`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ pin })
+        body: JSON.stringify({ pin, contestantId })
     });
 
     if (!response.ok) {

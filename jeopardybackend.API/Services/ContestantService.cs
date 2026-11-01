@@ -32,7 +32,7 @@ namespace Jeopardy.API.Services
             _repository.AddScore(id, score);
         }
 
-        public Contestant GetContestant(Guid guid)
+        public Contestant? GetContestant(Guid guid)
         {
             return _repository.GetContestant(guid);
         }

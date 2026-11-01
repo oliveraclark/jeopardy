@@ -30,10 +30,9 @@ public class GamesController : ControllerBase
     [HttpPost("join")]
     public IActionResult JoinGame([FromBody] JoinGameRequest request)
     {
-        var game = _gameService.GetGameByPin(request.Pin);
-
-        if (game == null)
-            return NotFound(new { message = "Invalid game code." });
+        var game = _gameService.AddContestantToGame(request.Pin, request.ContestantId);
+        if (game is null)
+            return NotFound(new { message = "Game or contestant not found." });
 
         return Ok(new JoinGameResponse(
             game.Id,
