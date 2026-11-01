@@ -1,0 +1,10 @@
+using Jeopardy.API.Models;
+
+namespace Jeopardy.API.Repositories;
+
+public interface IGameRepository
+{
+    Game? GetById(Guid id);
+    Game? GetByPin(string pin);
+    void Add(Game game);
+}

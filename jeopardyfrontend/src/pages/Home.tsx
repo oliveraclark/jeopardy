@@ -4,20 +4,45 @@ import { PinInput } from "../components/base/input/pin-input";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { createGame, joinGame } from "../services/gameService";
+import { TextField } from "@mui/material";
 
 function Home() {
 
     const navigate = useNavigate();
     const [gamePin, setGamePin] = useState("");
+    const [name, setName] = useState("");
 
-    function generateRandomGamePin(): string {
-        const values = new Uint32Array(1);
-        globalThis.crypto.getRandomValues(values);
-        return (1111 + values[0] % 8888).toString();
+    async function handleCreateGame() {
+        try {
+            const game = await createGame();
+
+            navigate(`/game/${game.pin}`, {
+                state: {
+                    pin: game.pin,
+                    role: "host"
+                }
+            });
+        } catch (error) {
+            console.error(error);
+        }
     }
 
-    function handleNavigate() {
-        navigate(`/game/${generateRandomGamePin()}`);
+    async function handleJoinGame() {
+        if (gamePin.length !== 4) return;
+
+        try {
+            const game = await joinGame(gamePin);
+
+            navigate(`/game/${game.pin}`, {
+                state: {
+                    role: "contestant"
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            // Eventually display an error message to the user.
+        }
     }
 
     return (
@@ -26,6 +51,16 @@ function Home() {
             <Box component="h1" sx={{fontSize: {xs: '2rem', sm: '2.5rem'}, fontWeight: 'bold', lineHeight: 1.2, m: 0, mb: 3, textAlign: 'center'}}>
                 Welcome!
             </Box>
+
+            <Box sx={{m: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: 'min(100%, 24rem)'}}>
+                <TextField
+                    label="Your Name"
+                    variant="outlined"
+                    fullWidth
+                    onChange={(e) => setName(e.target.value)}
+                />
+            </Box>
+
             <Box sx={{m: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: 'min(100%, 24rem)'}}>
                 <Box component="h2" sx={{fontSize: '1.25rem', fontWeight: 'semi-bold', lineHeight: 1.4, m: 0, mb: 2}}>
                     Enter game code
@@ -49,12 +84,12 @@ function Home() {
                     sx={{mt: 2}}
                     variant="contained"
                     disabled={gamePin.length !== 4}
-                    onClick={() => navigate(`/game/${gamePin}`)}
+                    onClick={handleJoinGame}
                 >
                     Join
                 </Button>
             </Box>
-            <Button sx={{m: 5, position: 'fixed', right: 3, bottom: 3, zIndex: 1}} variant="contained" onClick={handleNavigate}>Create Game</Button>
+            <Button sx={{m: 5, position: 'fixed', right: 3, bottom: 3, zIndex: 1}} variant="contained" onClick={handleCreateGame}>Create Game</Button>
         </Box>
 
     )
