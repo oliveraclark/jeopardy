@@ -7,10 +7,13 @@ import { Box } from '@mui/material';
 import { dummyUsers } from '../data/contestants.data';
 import { Contestant } from '../data/contestants.data';
 import Leaderboard from '../components/common/Leaderboard';
+import { useParams } from 'react-router-dom';
+
 
 
 function Game() {
 
+    const { pin } = useParams();
     const [selectedQuestion, setSelectedQuestion] = useState<GameQuestion | null>(null);
     const [contestants, setContestants] = useState(dummyUsers)
     const [gameQuestions, setGameQuestions] = useState(gameTiles)
