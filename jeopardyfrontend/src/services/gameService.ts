@@ -5,7 +5,7 @@ export interface CreateGameResponse {
     pin: string;
 }
 
-export interface JoinGameResponse {
+export interface GetGameResponse {
     gameId: string;
     pin: string;
     status: string;
@@ -13,7 +13,7 @@ export interface JoinGameResponse {
 
 export async function createGame(): Promise<CreateGameResponse> {
     const response = await fetch(`${API_URL}/games`, {
-        method: "POST"
+        method: "POST",
     });
 
     if (!response.ok) {
@@ -23,17 +23,13 @@ export async function createGame(): Promise<CreateGameResponse> {
     return response.json();
 }
 
-export async function joinGame(pin: string, contestantId: string): Promise<JoinGameResponse> {
-    const response = await fetch(`${API_URL}/games/join`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ pin, contestantId })
+export async function getGame(gamePin: string): Promise<GetGameResponse> {
+    const response = await fetch(`${API_URL}/games/${encodeURIComponent(gamePin)}`, {
+        method: "GET",
     });
 
     if (!response.ok) {
-        throw new Error("Invalid game code");
+        throw new Error("Game not found");
     }
 
     return response.json();

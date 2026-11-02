@@ -9,10 +9,12 @@ namespace Jeopardy.API.Controllers;
 public class GamesController : ControllerBase
 {
     private readonly GameService _gameService;
+    private readonly ContestantService _contestantService;
 
-    public GamesController(GameService gameService)
+    public GamesController(GameService gameService, ContestantService contestantService)
     {
         _gameService = gameService;
+        _contestantService = contestantService;
     }
 
     [HttpPost]
@@ -27,17 +29,40 @@ public class GamesController : ControllerBase
         });
     }
 
-    [HttpPost("join")]
-    public IActionResult JoinGame([FromBody] JoinGameRequest request)
+    [HttpGet("{pin:int}")]
+    public IActionResult GetGame(int pin)
     {
-        var game = _gameService.AddContestantToGame(request.Pin, request.ContestantId);
+        var game = _gameService.GetGameByPin(pin.ToString());
         if (game is null)
-            return NotFound(new { message = "Game or contestant not found." });
-
-        return Ok(new JoinGameResponse(
-            game.Id,
+        {
+            return NotFound(new { message = "Game not found." });
+        }
+        return Ok(new GetGameResponse(game.Id,
             game.Pin,
             game.Status.ToString()
         ));
     }
+
+    [HttpPost("{pin:int}/contestants")]
+    public IActionResult AddContestant(int pin, [FromBody] AddContestantRequest request)
+    {
+        var game = _gameService.GetGameByPin(pin.ToString());
+
+        if (game is null)
+        {
+            return NotFound(new { message = "Game not found." });
+        }
+
+        var contestant = _contestantService.CreateContestant(request.Name);
+
+        _gameService.AddContestantToGame(pin.ToString(), contestant.Id);
+
+        return Ok(new CreateContestantResponse
+        {
+            Id = contestant.Id,
+            Name = contestant.Name
+        });
+    }
+
+
 }

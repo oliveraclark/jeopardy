@@ -4,9 +4,10 @@ import { PinInput } from "../components/base/input/pin-input";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { createGame, joinGame } from "../services/gameService";
-import { createContestant } from "../services/userService";
+import { createGame, getGame } from "../services/gameService";
+import { addContestant } from "../services/userService";
 import { TextField } from "@mui/material";
+import { GetGameResponse } from "../services/gameService";
 
 function Home() {
 
@@ -33,8 +34,8 @@ function Home() {
         if (gamePin.length !== 4) return;
 
         try {
-            const response = await createContestant({ name });
-            const game = await joinGame(gamePin, response.id);
+            const game: GetGameResponse = await getGame(gamePin);
+            await addContestant({ name: name, gamePin: game.pin });
 
             navigate(`/game/${game.pin}`, {
                 state: {

@@ -18,7 +18,7 @@ namespace Jeopardy.API.Controllers
         [HttpPost("createContestant")]
         public IActionResult CreateContestant([FromBody] CreateContestantRequest request)
         {
-            var contestant = _contestantService.CreateContestant(request.Name);
+            var contestant = _contestantService.CreateContestant(request.name);
 
             return Ok(new CreateContestantResponse
             {

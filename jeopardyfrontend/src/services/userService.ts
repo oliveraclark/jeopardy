@@ -1,10 +1,11 @@
 const API_URL = "http://localhost:5238/api";
 
-export interface CreateContestantRequest {
+export interface AddContestantRequest {
     name: string;
+    gamePin: string;
 }
 
-export interface CreateContestantResponse {
+export interface AddContestantResponse {
     id: string;
     name: string;
 }
@@ -14,16 +15,21 @@ export interface AddScoreRequest {
     score: number;
 }
 
-export async function createContestant(
-    request: CreateContestantRequest
-): Promise<CreateContestantResponse> {
-    const response = await fetch(`${API_URL}/contestants/createContestant`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(request)
-    });
+export async function addContestant(
+    request: AddContestantRequest
+): Promise<AddContestantResponse> {
+    const response = await fetch(
+        `${API_URL}/games/${request.gamePin}/contestants`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: request.name
+            })
+        }
+    );
 
     if (!response.ok) {
         throw new Error("Failed to create contestant");

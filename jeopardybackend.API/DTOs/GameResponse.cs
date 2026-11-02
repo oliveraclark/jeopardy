@@ -5,3 +5,9 @@ public record JoinGameResponse(
     string Pin,
     string Status
 );
+
+public record GetGameResponse(
+    Guid GameId,
+    string Pin,
+    string Status
+);
