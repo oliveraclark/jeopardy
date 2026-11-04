@@ -45,13 +45,13 @@ function Leaderboard({ contestants }: LeaderboardProps) {
                 <TableBody>
                     {sortedContestants.map((contestant, index) => (
                         <TableRow key={contestant.id}>
-                            <TableCell>{index + 1}</TableCell>
+                            <TableCell sx={{fontSize: "2em"}}>{index + 1}</TableCell>
 
-                            <TableCell>
+                            <TableCell sx={{fontSize: "2em"}}>
                                 {contestant.name}
                             </TableCell>
 
-                            <TableCell align="right">
+                            <TableCell sx={{fontSize: "2em"}} align="right">
                                 {contestant.score}
                             </TableCell>
                         </TableRow>
