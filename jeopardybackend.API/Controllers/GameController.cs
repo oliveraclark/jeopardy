@@ -64,5 +64,38 @@ public class GamesController : ControllerBase
         });
     }
 
+    [HttpGet("{pin:int}/contestants")]
+    public IActionResult GetContestantsByPin(int pin)
+    {
+        var game = _gameService.GetGameByPin(pin.ToString());
+
+        if (game is null)
+        {
+            return NotFound(new { message = "Game not found." });
+        }
+
+        return Ok(new GetContestantsByPinResponse
+        {
+            contestants = game.Contestants
+        });
+    }
+
+    [HttpPatch("{pin:int}/contestants")]
+    public IActionResult GetContestantsByPin(int pin, [FromBody] AddScoreRequest request)
+    {
+        var contestant = _contestantService.GetContestant(request.Id);
+
+        if(contestant == null)
+        {
+            return NotFound("Contestant not found");
+        }
+
+        _contestantService.AddScore(request.Id, request.Score);
+
+        return Ok();
+    }
+
+
+
 
 }

@@ -5,7 +5,7 @@ import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { createGame, getGame } from "../services/gameService";
-import { addContestant } from "../services/userService";
+import { addContestant } from "../services/contestantService";
 import { TextField } from "@mui/material";
 import { GetGameResponse } from "../services/gameService";
 
@@ -69,7 +69,6 @@ function Home() {
                     Enter game code
                 </Box>
                 <PinInput>
-                    <PinInput.Label>Secure code</PinInput.Label>
                     <PinInput.Group
                         maxLength={4}
                         pattern={REGEXP_ONLY_DIGITS}

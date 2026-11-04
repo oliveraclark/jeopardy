@@ -1,3 +1,5 @@
+import { Contestant } from "@/data/contestants.data";
+
 const API_URL = "http://localhost:5238/api";
 
 export interface AddContestantRequest {
@@ -5,15 +7,26 @@ export interface AddContestantRequest {
     gamePin: string;
 }
 
+export interface AddScoreRequest {
+    gamePin: string,
+    id: string;
+    score: number;
+}
+
+export interface GetContestantsByPinRequest {
+    gamePin: string
+}
+
 export interface AddContestantResponse {
     id: string;
     name: string;
 }
 
-export interface AddScoreRequest {
-    id: string;
-    score: number;
+export interface GetContestantsByPinResponse {
+    contestants: Contestant[]
 }
+
+
 
 export async function addContestant(
     request: AddContestantRequest
@@ -38,9 +51,29 @@ export async function addContestant(
     return response.json();
 }
 
+export async function getContestantsByPin(
+    request: GetContestantsByPinRequest
+): Promise<GetContestantsByPinResponse> {
+    const response = await fetch(
+        `${API_URL}/games/${request.gamePin}/contestants`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to create contestant");
+    }
+
+    return response.json();
+}
+
 export async function addScore(request: AddScoreRequest): Promise<void> {
-    const response = await fetch(`${API_URL}/contestants/addScore`, {
-        method: "PUT",
+    const response = await fetch(`${API_URL}/games/${request.gamePin}/contestants`, {
+        method: "PATCH",
         headers: {
             "Content-Type": "application/json"
         },

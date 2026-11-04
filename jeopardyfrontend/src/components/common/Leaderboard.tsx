@@ -1,39 +1,73 @@
-import { useState } from "react";
 import { Contestant } from "../../data/contestants.data";
-import { TableContainer } from "@mui/material";
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Table from '@mui/material/Table';
-import Box from "@mui/material/Box";
-
+import {
+    TableContainer,
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    Paper
+} from "@mui/material";
 
 export interface LeaderboardProps {
-    contestants: Contestant[]
+    contestants: Contestant[];
 }
 
 function Leaderboard({ contestants }: LeaderboardProps) {
+    const sortedContestants = [...contestants].sort(
+        (a, b) => b.score - a.score
+    );
+
     return (
-        <Box sx={{display: 'flex', justifyContent: 'center', flexDirection: 'row'}} >
-            {contestants.map((contestant: Contestant) => (
-                    <TableContainer sx={{width: '150px'}}>
-                        <Table>
-                            <TableHead>
-                                <TableCell sx={{fontWeight: 'bold', fontSize: '2em'}}>
-                                    {contestant.name}
-                                </TableCell>
-                            </TableHead>
-                            <TableRow>
-                                <TableCell sx={{fontSize: '2em'}}>
-                                    {contestant.score}
-                                </TableCell>
-                            </TableRow>
-                        </Table>
-                    </TableContainer>
-        ))}
-        </Box>
-        
-    )
+        <TableContainer
+            component={Paper}
+            sx={{
+                maxWidth: 600,
+                width: "100%",
+                borderRadius: 2
+            }}
+        >
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell sx={{ fontSize: '2em', fontWeight: "bold" }}>
+                            Rank
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '2em', fontWeight: "bold" }}>
+                            Contestant
+                        </TableCell>
+                        <TableCell sx={{ fontSize: '2em', fontWeight: "bold" }} align="right">
+                            Score
+                        </TableCell>
+                    </TableRow>
+                </TableHead>
+
+                <TableBody>
+                    {sortedContestants.map((contestant, index) => (
+                        <TableRow key={contestant.id}>
+                            <TableCell>{index + 1}</TableCell>
+
+                            <TableCell>
+                                {contestant.name}
+                            </TableCell>
+
+                            <TableCell align="right">
+                                {contestant.score}
+                            </TableCell>
+                        </TableRow>
+                    ))}
+
+                    {contestants.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={3} align="center">
+                                No contestants yet
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    );
 }
-export default Leaderboard
+
+export default Leaderboard;
