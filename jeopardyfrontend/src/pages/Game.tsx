@@ -20,6 +20,7 @@ function Game() {
     const navigate = useNavigate();
 
     const {
+        selectedQuestion,
         gameState,
         updateGameState,
         selectQuestion,
@@ -89,8 +90,6 @@ function Game() {
 
             if (score > 0) {
                 markQuestionAnswered(answeredQuestion.id);
-            } else {
-                selectQuestion(null);
             }
 
         } catch (error) {
@@ -99,12 +98,19 @@ function Game() {
     }
 
     if (!gameState) {
-        return <div>Loading game...</div>;
+        return <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh'
+            }}
+        >
+            <h1>Loading game...</h1>
+        </Box>
     }
-
-    const selectedQuestion = gameState.gameQuestions.find(
-        question => question.id === gameState.selectedQuestionId
-    );
 
     return (
         <Box

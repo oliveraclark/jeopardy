@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { GameState, GameQuestion } from "../types/game.types";
 import { Contestant } from "../data/contestants.data";
 
 export function useGameState() {
     const [gameState, setGameState] = useState<GameState | null>(null);
 
-    function updateGameState(newState: GameState) {
+    const updateGameState = useCallback((newState: GameState) => {
         setGameState(newState);
-    }
+    }, []);
 
     function selectQuestion(question: GameQuestion | null) {
         setGameState(current => {
