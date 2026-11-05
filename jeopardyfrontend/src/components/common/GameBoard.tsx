@@ -38,7 +38,7 @@ function GameBoard({ questions, onSelectQuestion }: GameBoardProps) {
             <TableBody>
                 {gameQuestions.filter((item: GameQuestion) => item.questionType === questionType).map((row: GameQuestion) => (
                     <TableRow
-                    key={`${row.questionType}-${row.value}`}
+                    key={row.id}
                     >
                         <TableCell
                             component="th"

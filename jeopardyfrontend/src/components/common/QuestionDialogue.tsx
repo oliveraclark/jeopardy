@@ -18,7 +18,7 @@ import { Contestant } from "../../data/contestants.data";
 
 export interface QuestionDialogueProps {
     question: GameQuestion;
-    setQuestion: Dispatch<SetStateAction<GameQuestion | null>>;
+    setQuestion: (question: GameQuestion | null) => void;
     onSubmit: (contestant: Contestant, score: number, answeredQuestion: GameQuestion) => void;
     contestants: Contestant[];
 }

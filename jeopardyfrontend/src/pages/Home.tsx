@@ -19,6 +19,8 @@ function Home() {
         try {
             const game = await createGame();
 
+            localStorage.setItem("isHost", "true");
+
             navigate(`/game/${game.pin}`, {
                 state: {
                     pin: game.pin,
@@ -35,7 +37,8 @@ function Home() {
 
         try {
             const game: GetGameResponse = await getGame(gamePin);
-            await addContestant({ name: name, gamePin: game.pin });
+            const contestantID = (await addContestant({ name: name, gamePin: game.pin })).id;
+            localStorage.setItem("contestantID", contestantID)
 
             navigate(`/game/${game.pin}`, {
                 state: {

@@ -3,7 +3,8 @@ namespace Jeopardy.API.DTOs;
 public record GetGameResponse(
     Guid GameId,
     string Pin,
-    string Status
+    string Status,
+    List<Contestant> Contestants
 );
 
 public class CreateGameResponse

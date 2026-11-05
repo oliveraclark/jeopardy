@@ -6,7 +6,14 @@ function createGameTile(
     hint: string,
     answer: string,
     ): GameQuestion {
-    return { questionType, value, hint, answer, answered: false };
+    return {
+        id: `${questionType.toLowerCase()}-${value}`,
+        questionType,
+        value,
+        hint,
+        answer,
+        answered: false
+    };
 };
 
 export const gameTiles: GameQuestion[] = [

@@ -39,7 +39,8 @@ public class GamesController : ControllerBase
         }
         return Ok(new GetGameResponse(game.Id,
             game.Pin,
-            game.Status.ToString()
+            game.Status.ToString(),
+            game.Contestants
         ));
     }
 

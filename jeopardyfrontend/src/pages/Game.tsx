@@ -1,40 +1,77 @@
-import { useState } from 'react';
+
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Box } from '@mui/material';
+
 import GameBoard from '../components/common/GameBoard';
 import QuestionDialogue from '../components/common/QuestionDialogue';
-import { GameQuestion } from "../types/game.types";
-import { gameTiles } from '../data/question.data';
-import { Box } from '@mui/material';
-import { Contestant } from '../data/contestants.data';
 import Leaderboard from '../components/common/Leaderboard';
-import { useEffect } from 'react';
-import { getContestantsByPin, addScore } from '../services/contestantService';
-import { useParams } from 'react-router-dom';
 
+import { gameTiles } from '../data/question.data';
+import { Contestant } from '../data/contestants.data';
+import { GameQuestion, GameState } from '../types/game.types';
 
+import { addScore } from '../services/contestantService';
+import { getGame } from '../services/gameService';
+import { useGameState } from '../hooks/useGameState';
 
 function Game() {
-
     const { pin } = useParams<{ pin: string }>();
-    const [selectedQuestion, setSelectedQuestion] = useState<GameQuestion | null>(null);
-    const [contestants, setContestants] = useState<Contestant[]>([]);
-    const [gameQuestions, setGameQuestions] = useState(gameTiles)
+    const navigate = useNavigate();
+
+    const {
+        gameState,
+        updateGameState,
+        selectQuestion,
+        updateContestantScore,
+        markQuestionAnswered
+    } = useGameState();
 
     useEffect(() => {
-        async function fetchContestants() {
-            if (!pin) return;
+        async function loadGame() {
+            const contestantID = localStorage.getItem('contestantID');
+            const isHost = localStorage.getItem('isHost') === 'true';
+
+            if (!pin || (!isHost && !contestantID)) {
+                navigate('/', { replace: true });
+                return;
+            }
+
             try {
-                const data = await getContestantsByPin({ gamePin: pin });
-                setContestants(data.contestants);
+                const fetchedGame = await getGame(pin);
+
+                if (!isHost) {
+                    const joined = fetchedGame.contestants.some(
+                        (contestant: Contestant) =>
+                            contestant.id === contestantID
+                    );
+
+                    if (!joined) {
+                        navigate('/', { replace: true });
+                        return;
+                    }
+                }
+
+                const loadedGameState: GameState = {
+                    id: fetchedGame.gameId,
+                    pin,
+                    contestants: fetchedGame.contestants,
+                    gameQuestions: gameTiles,
+                    selectedQuestionId: null
+                };
+
+                updateGameState(loadedGameState);
+
             } catch (error) {
-                console.error(error);
+                console.error('Failed to load game:', error);
+                navigate('/', { replace: true });
             }
         }
 
-        fetchContestants();
-    }, [pin]);
+        loadGame();
+    }, [pin, navigate, updateGameState]);
 
-
-    async function updateGameState(
+    async function submitAnswer(
         contestant: Contestant,
         score: number,
         answeredQuestion: GameQuestion
@@ -45,66 +82,58 @@ function Game() {
             await addScore({
                 gamePin: pin,
                 id: contestant.id,
-                score: score
+                score
             });
 
-            // Update local contestant state after backend succeeds
-            setContestants(prev =>
-                prev.map((c: Contestant) => {
-                    if (c.id === contestant.id) {
-                        return {
-                            ...c,
-                            score: c.score + score,
-                            nIncorrect: score < 0 ? c.nIncorrect + 1 : c.nIncorrect,
-                            nCorrect: score > 0 ? c.nCorrect + 1 : c.nCorrect,
-                        };
-                    }
+            updateContestantScore(contestant.id, score);
 
-                    return c;
-                })
-            );
-
-            // Mark question as answered if correct
             if (score > 0) {
-                setGameQuestions(prev =>
-                    prev.map((q: GameQuestion) => {
-                        if (
-                            q.value === answeredQuestion.value &&
-                            q.questionType === answeredQuestion.questionType
-                        ) {
-                            return {
-                                ...q,
-                                answered: true
-                            };
-                        }
-
-                        return q;
-                    })
-                );
+                markQuestionAnswered(answeredQuestion.id);
+            } else {
+                selectQuestion(null);
             }
 
         } catch (error) {
-            console.error("Failed to update game state:", error);
+            console.error('Failed to update game state:', error);
         }
     }
 
+    if (!gameState) {
+        return <div>Loading game...</div>;
+    }
+
+    const selectedQuestion = gameState.gameQuestions.find(
+        question => question.id === gameState.selectedQuestionId
+    );
+
     return (
-        
-        <Box sx={{display: 'flex', flexDirection: 'column', gap: 10, justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
-            <title>Jeoprady!</title>
-            <Leaderboard contestants={contestants} />
-            <GameBoard questions={gameQuestions} onSelectQuestion={setSelectedQuestion} />
-            {selectedQuestion !== null && (
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh'
+            }}
+        >
+            <Leaderboard contestants={gameState.contestants} />
+
+            <GameBoard
+                questions={gameState.gameQuestions}
+                onSelectQuestion={selectQuestion}
+            />
+
+            {selectedQuestion && (
                 <QuestionDialogue
                     question={selectedQuestion}
-                    setQuestion={setSelectedQuestion}
-                    onSubmit={updateGameState}
-                    contestants={contestants}
-
+                    setQuestion={selectQuestion}
+                    onSubmit={submitAnswer}
+                    contestants={gameState.contestants}
                 />
             )}
         </Box>
-        
     );
 }
-export default Game
+
+export default Game;

@@ -1,3 +1,4 @@
+import { Contestant } from "@/data/contestants.data";
 const API_URL = "http://localhost:5238/api";
 
 export interface CreateGameResponse {
@@ -9,6 +10,7 @@ export interface GetGameResponse {
     gameId: string;
     pin: string;
     status: string;
+    contestants: Contestant[]
 }
 
 export async function createGame(): Promise<CreateGameResponse> {
