@@ -4,4 +4,9 @@ namespace Jeopardy.API.DTOs
     {
         public List<Contestant> contestants { get; set ;} = new List<Contestant>();
     };
+
+    public class GetContestantRequest
+    {
+        public Contestant contestant { get; set; } = new Contestant();
+    }
 }

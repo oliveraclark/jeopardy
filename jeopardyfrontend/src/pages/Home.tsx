@@ -8,18 +8,20 @@ import { createGame, getGame } from "../services/gameService";
 import { addContestant } from "../services/contestantService";
 import { TextField } from "@mui/material";
 import { GetGameResponse } from "../services/gameService";
-
+import { useGameState } from '../hooks/useGameState';
 function Home() {
 
     const navigate = useNavigate();
     const [gamePin, setGamePin] = useState("");
     const [name, setName] = useState("");
+    const {addContestantToState} = useGameState();
 
     async function handleCreateGame() {
         try {
             const game = await createGame();
 
             localStorage.setItem("isHost", "true");
+            localStorage.removeItem("contestantID");
 
             navigate(`/game/${game.pin}`, {
                 state: {
@@ -28,17 +30,23 @@ function Home() {
                 }
             });
         } catch (error) {
-            console.error(error);
+            console.error("Failed to create game:", error);
         }
     }
 
     async function handleJoinGame() {
-        if (gamePin.length !== 4) return;
+        if (gamePin.length !== 4 || !name.trim()) return;
 
         try {
             const game: GetGameResponse = await getGame(gamePin);
-            const contestantID = (await addContestant({ name: name, gamePin: game.pin })).id;
-            localStorage.setItem("contestantID", contestantID)
+
+            const contestant = await addContestant({
+                name: name.trim(),
+                gamePin: game.pin
+            });
+
+            localStorage.setItem("contestantID", contestant.id);
+            localStorage.removeItem("isHost");
 
             navigate(`/game/${game.pin}`, {
                 state: {
@@ -46,8 +54,7 @@ function Home() {
                 }
             });
         } catch (error) {
-            console.error(error);
-            // Eventually display an error message to the user.
+            console.error("Failed to join game:", error);
         }
     }
 

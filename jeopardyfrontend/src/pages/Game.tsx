@@ -6,6 +6,7 @@ import { Box } from '@mui/material';
 import GameBoard from '../components/common/GameBoard';
 import QuestionDialogue from '../components/common/QuestionDialogue';
 import Leaderboard from '../components/common/Leaderboard';
+import Buzzer from '../components/common/Buzzer';
 
 import { gameTiles } from '../data/question.data';
 import { Contestant } from '../data/contestants.data';
@@ -14,9 +15,11 @@ import { GameQuestion, GameState } from '../types/game.types';
 import { addScore } from '../services/contestantService';
 import { getGame } from '../services/gameService';
 import { useGameState } from '../hooks/useGameState';
+import * as signalR from "@microsoft/signalr";
 
 function Game() {
     const { pin } = useParams<{ pin: string }>();
+    const isHost = localStorage.getItem('isHost') === 'true';
     const navigate = useNavigate();
 
     const {
@@ -25,13 +28,17 @@ function Game() {
         updateGameState,
         selectQuestion,
         updateContestantScore,
-        markQuestionAnswered
+        markQuestionAnswered,
+        addContestantToState
     } = useGameState();
 
     useEffect(() => {
-        async function loadGame() {
+    let connection: signalR.HubConnection | null = null;
+    let cancelled = false;
+
+    async function loadGame() {
             const contestantID = localStorage.getItem('contestantID');
-            const isHost = localStorage.getItem('isHost') === 'true';
+            
 
             if (!pin || (!isHost && !contestantID)) {
                 navigate('/', { replace: true });
@@ -40,6 +47,8 @@ function Game() {
 
             try {
                 const fetchedGame = await getGame(pin);
+
+                if (cancelled) return;
 
                 if (!isHost) {
                     const joined = fetchedGame.contestants.some(
@@ -63,14 +72,66 @@ function Game() {
 
                 updateGameState(loadedGameState);
 
+                // Create SignalR connection
+                connection = new signalR.HubConnectionBuilder()
+                    .withUrl('http://localhost:5238/gameHub')
+                    .withAutomaticReconnect()
+                    .build();
+
+                // Listen for contestants joining
+                connection.on(
+                    'ContestantJoined',
+                    (contestant: Contestant) => {
+                        if (!cancelled) {
+                            addContestantToState(contestant);
+                        }
+                    }
+                );
+
+                connection.onreconnected(async () => {
+                    if (cancelled) return;
+
+                    console.log('SignalR reconnected. Rejoining game:', pin);
+
+                    try {
+                        await connection?.invoke('JoinGame', pin);
+                        console.log('Successfully rejoined game:', pin);
+                    } catch (error) {
+                        console.error('Failed to rejoin game:', error);
+                    }
+                });
+
+                // Connect and join the game group
+                await connection.start();
+
+                if (cancelled) {
+                    await connection.stop();
+                    return;
+                }
+
+                await connection.invoke('JoinGame', pin);
+
+                console.log('Connected to SignalR game:', pin);
+
             } catch (error) {
                 console.error('Failed to load game:', error);
-                navigate('/', { replace: true });
+
+                if (!cancelled) {
+                    navigate('/', { replace: true });
+                }
             }
         }
 
         loadGame();
-    }, [pin, navigate, updateGameState]);
+
+        return () => {
+            cancelled = true;
+
+            if (connection) {
+                connection.stop();
+            }
+        };
+    }, [pin, navigate, updateGameState, addContestantToState]);
 
     async function submitAnswer(
         contestant: Contestant,
@@ -110,6 +171,23 @@ function Game() {
         >
             <h1>Loading game...</h1>
         </Box>
+    }
+
+    if(!isHost) {
+        return (
+            <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh'
+            }}
+        >
+            <Buzzer></Buzzer>
+        </Box>
+        )
     }
 
     return (

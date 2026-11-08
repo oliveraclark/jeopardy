@@ -5,13 +5,15 @@ public record CreateContestantRequest(
 );
 
 public class CreateContestantResponse
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-    }
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
 
-    public class AddScoreRequest
-    {
-        public Guid Id { get; set; }
-        public int Score { get; set; }
-    }
+public class AddScoreRequest
+{
+    public Guid Id { get; set; }
+    public int Score { get; set; }
+}
+
+

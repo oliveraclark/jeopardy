@@ -1,3 +1,4 @@
+
 import { useCallback, useState } from "react";
 import { GameState, GameQuestion } from "../types/game.types";
 import { Contestant } from "../data/contestants.data";
@@ -9,7 +10,7 @@ export function useGameState() {
         setGameState(newState);
     }, []);
 
-    function selectQuestion(question: GameQuestion | null) {
+    const selectQuestion = useCallback((question: GameQuestion | null) => {
         setGameState(current => {
             if (!current) return current;
 
@@ -18,15 +19,35 @@ export function useGameState() {
                 selectedQuestionId: question?.id ?? null
             };
         });
-    }
+    }, []);
 
-    function updateContestantScore(contestantId: string, score: number) {
+    const addContestantToState = useCallback((contestant: Contestant) => {
+        setGameState(current => {
+            if (!current) return current;
+
+            const alreadyExists = current.contestants.some(
+                existing => existing.id === contestant.id
+            );
+
+            if (alreadyExists) return current;
+
+            return {
+                ...current,
+                contestants: [...current.contestants, contestant]
+            };
+        });
+    }, []);
+
+    const updateContestantScore = useCallback((
+        contestantId: string,
+        score: number
+    ) => {
         setGameState(current => {
             if (!current) return current;
 
             return {
                 ...current,
-                contestants: current.contestants.map((contestant: Contestant) =>
+                contestants: current.contestants.map(contestant =>
                     contestant.id === contestantId
                         ? {
                             ...contestant,
@@ -42,9 +63,9 @@ export function useGameState() {
                 )
             };
         });
-    }
+    }, []);
 
-    function markQuestionAnswered(questionId: string) {
+    const markQuestionAnswered = useCallback((questionId: string) => {
         setGameState(current => {
             if (!current) return current;
 
@@ -58,7 +79,7 @@ export function useGameState() {
                 selectedQuestionId: null
             };
         });
-    }
+    }, []);
 
     const selectedQuestion = gameState?.gameQuestions.find(
         question => question.id === gameState.selectedQuestionId
@@ -70,6 +91,7 @@ export function useGameState() {
         updateGameState,
         selectQuestion,
         updateContestantScore,
-        markQuestionAnswered
+        markQuestionAnswered,
+        addContestantToState
     };
 }

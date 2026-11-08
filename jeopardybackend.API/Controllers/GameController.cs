@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Jeopardy.API.DTOs;
 using Jeopardy.API.Services;
+using Jeopardy.API.Hubs;
+
 
 namespace Jeopardy.API.Controllers;
 
@@ -10,11 +13,13 @@ public class GamesController : ControllerBase
 {
     private readonly GameService _gameService;
     private readonly ContestantService _contestantService;
-
-    public GamesController(GameService gameService, ContestantService contestantService)
+    private readonly IHubContext<GameHub> _hubContext;
+    public GamesController(GameService gameService, ContestantService contestantService, IHubContext<GameHub> hubContext)
     {
         _gameService = gameService;
         _contestantService = contestantService;
+        _hubContext = hubContext;
+        
     }
 
     [HttpPost]
@@ -45,7 +50,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPost("{pin:int}/contestants")]
-    public IActionResult AddContestant(int pin, [FromBody] AddContestantRequest request)
+    public async Task<IActionResult> AddContestant(int pin, [FromBody] AddContestantRequest request)
     {
         var game = _gameService.GetGameByPin(pin.ToString());
 
@@ -57,6 +62,10 @@ public class GamesController : ControllerBase
         var contestant = _contestantService.CreateContestant(request.Name);
 
         _gameService.AddContestantToGame(pin.ToString(), contestant.Id);
+
+        await _hubContext.Clients
+            .Group(pin.ToString())
+            .SendAsync("ContestantJoined", contestant);
 
         return Ok(new CreateContestantResponse
         {
@@ -81,8 +90,27 @@ public class GamesController : ControllerBase
         });
     }
 
+    [HttpGet("{pin:int}/contestants/{id:guid}")]
+    public IActionResult GetContestant(int pin, Guid id)
+    {
+        var game = _gameService.GetGameByPin(pin.ToString());
+        var contestant = _contestantService.GetContestant(id);
+
+        if(contestant == null || game == null)
+        {
+            return NotFound("Contestant or game not found");
+        }
+
+        return Ok(new GetContestantRequest
+        {
+            contestant = contestant
+        });
+    }
+
+
+
     [HttpPatch("{pin:int}/contestants")]
-    public IActionResult GetContestantsByPin(int pin, [FromBody] AddScoreRequest request)
+    public IActionResult AddScoreToContestant(int pin, [FromBody] AddScoreRequest request)
     {
         var contestant = _contestantService.GetContestant(request.Id);
 

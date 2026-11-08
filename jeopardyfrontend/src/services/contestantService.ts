@@ -17,6 +17,15 @@ export interface GetContestantsByPinRequest {
     gamePin: string
 }
 
+export interface GetContestantRequest {
+    gamePin: string,
+    id: string
+}
+
+export interface GetContestantResponse {
+    contestant: Contestant
+}
+
 export interface AddContestantResponse {
     id: string;
     name: string;
@@ -56,6 +65,26 @@ export async function getContestantsByPin(
 ): Promise<GetContestantsByPinResponse> {
     const response = await fetch(
         `${API_URL}/games/${request.gamePin}/contestants`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to create contestant");
+    }
+
+    return response.json();
+}
+
+export async function getContestantById(
+    request: GetContestantRequest
+): Promise<GetContestantResponse> {
+    const response = await fetch(
+        `${API_URL}/games/${request.gamePin}/contestants/${request.id}`,
         {
             method: "GET",
             headers: {
