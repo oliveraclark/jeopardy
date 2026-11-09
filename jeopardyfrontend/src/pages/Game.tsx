@@ -12,7 +12,7 @@ import { gameTiles } from '../data/question.data';
 import { Contestant } from '../data/contestants.data';
 import { GameQuestion, GameState } from '../types/game.types';
 
-import { addScore } from '../services/contestantService';
+import { recordAnsweredQuestion } from '../services/contestantService';
 import { getGame } from '../services/gameService';
 import { useGameState } from '../hooks/useGameState';
 import * as signalR from "@microsoft/signalr";
@@ -66,7 +66,10 @@ function Game() {
                     id: fetchedGame.gameId,
                     pin,
                     contestants: fetchedGame.contestants,
-                    gameQuestions: gameTiles,
+                    gameQuestions: gameTiles.map(question => ({
+                        ...question,
+                        answered: fetchedGame.answeredQuestionIds.includes(question.id)
+                    })),
                     selectedQuestionId: null
                 };
 
@@ -87,6 +90,20 @@ function Game() {
                         }
                     }
                 );
+
+                if(!isHost) {
+                    // Listen for score changes
+                    connection.on(
+                        'ScoreChange',
+                        (contestantId: string, score: number, questionId: string) => {
+                            if (cancelled) return;
+
+                            updateContestantScore(contestantId, score);
+                            if (score > 0) markQuestionAnswered(questionId);
+                        }
+                    );
+                }
+                
 
                 connection.onreconnected(async () => {
                     if (cancelled) return;
@@ -141,10 +158,11 @@ function Game() {
         if (!pin) return;
 
         try {
-            await addScore({
+            await recordAnsweredQuestion({
                 gamePin: pin,
                 id: contestant.id,
-                score
+                score,
+                questionId: answeredQuestion.id
             });
 
             updateContestantScore(contestant.id, score);
@@ -173,22 +191,22 @@ function Game() {
         </Box>
     }
 
-    if(!isHost) {
-        return (
-            <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100vh'
-            }}
-        >
-            <Buzzer></Buzzer>
-        </Box>
-        )
-    }
+    // if(!isHost) {
+    //     return (
+    //         <Box
+    //         sx={{
+    //             display: 'flex',
+    //             flexDirection: 'column',
+    //             gap: 10,
+    //             justifyContent: 'center',
+    //             alignItems: 'center',
+    //             height: '100vh'
+    //         }}
+    //     >
+    //         <Buzzer></Buzzer>
+    //     </Box>
+    //     )
+    // }
 
     return (
         <Box

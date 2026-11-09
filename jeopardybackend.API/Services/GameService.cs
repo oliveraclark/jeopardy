@@ -63,5 +63,17 @@ namespace Jeopardy.API.Services
 
             return game;
         }
+
+        public void AddAnsweredQuestion(string pin, string questionId)
+        {
+            var game = GetGameByPin(pin);
+
+            if(game == null)
+            {
+                throw new Exception("Not Found, how did you get here?!");
+            }
+            
+            _repository.AddAnsweredQuestion(game.Id, questionId);
+        }
     }
 }

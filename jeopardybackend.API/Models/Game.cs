@@ -15,6 +15,8 @@ public class Game
     public GameStatus Status { get; set; }
 
     public List<Contestant> Contestants { get; set; } = new();
+
+    public List<string> AnsweredQuestionIds { get; set; } = new List<string>();
 }
 
 public enum GameStatus

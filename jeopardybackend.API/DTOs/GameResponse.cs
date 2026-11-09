@@ -4,7 +4,8 @@ public record GetGameResponse(
     Guid GameId,
     string Pin,
     string Status,
-    List<Contestant> Contestants
+    List<Contestant> Contestants,
+    List<string> AnsweredQuestionIds
 );
 
 public class CreateGameResponse

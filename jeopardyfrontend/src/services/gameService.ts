@@ -10,7 +10,8 @@ export interface GetGameResponse {
     gameId: string;
     pin: string;
     status: string;
-    contestants: Contestant[]
+    contestants: Contestant[],
+    answeredQuestionIds: string[]
 }
 
 export async function createGame(): Promise<CreateGameResponse> {

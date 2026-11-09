@@ -11,6 +11,7 @@ export interface AddScoreRequest {
     gamePin: string,
     id: string;
     score: number;
+    questionId: string
 }
 
 export interface GetContestantsByPinRequest {
@@ -100,7 +101,7 @@ export async function getContestantById(
     return response.json();
 }
 
-export async function addScore(request: AddScoreRequest): Promise<void> {
+export async function recordAnsweredQuestion(request: AddScoreRequest): Promise<void> {
     const response = await fetch(`${API_URL}/games/${request.gamePin}/contestants`, {
         method: "PATCH",
         headers: {

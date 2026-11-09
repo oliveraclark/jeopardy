@@ -14,7 +14,6 @@ function Home() {
     const navigate = useNavigate();
     const [gamePin, setGamePin] = useState("");
     const [name, setName] = useState("");
-    const {addContestantToState} = useGameState();
 
     async function handleCreateGame() {
         try {

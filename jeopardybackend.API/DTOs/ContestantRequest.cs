@@ -14,6 +14,7 @@ public class AddScoreRequest
 {
     public Guid Id { get; set; }
     public int Score { get; set; }
+    public string QuestionId { get; set; } = string.Empty;
 }
 
 

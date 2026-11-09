@@ -45,7 +45,8 @@ public class GamesController : ControllerBase
         return Ok(new GetGameResponse(game.Id,
             game.Pin,
             game.Status.ToString(),
-            game.Contestants
+            game.Contestants,
+            game.AnsweredQuestionIds
         ));
     }
 
@@ -110,16 +111,26 @@ public class GamesController : ControllerBase
 
 
     [HttpPatch("{pin:int}/contestants")]
-    public IActionResult AddScoreToContestant(int pin, [FromBody] AddScoreRequest request)
+    public async Task<IActionResult> RecordQuestionAnswered(int pin, [FromBody] AddScoreRequest request)
     {
         var contestant = _contestantService.GetContestant(request.Id);
+        var game = _gameService.GetGameByPin(pin.ToString());
 
-        if(contestant == null)
+        if(contestant == null || game == null)
         {
-            return NotFound("Contestant not found");
+            return NotFound("Contestant or game not found");
         }
 
         _contestantService.AddScore(request.Id, request.Score);
+
+        if(request.Score > 0)
+        {
+            _gameService.AddAnsweredQuestion(game.Pin, request.QuestionId);
+        }
+
+        await _hubContext.Clients
+            .Group(pin.ToString())
+            .SendAsync("ScoreChange", contestant.Id, request.Score, request.QuestionId);
 
         return Ok();
     }

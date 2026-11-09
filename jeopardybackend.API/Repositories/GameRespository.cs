@@ -43,4 +43,16 @@ public class GameRepository : IGameRepository
             return true;
         }
     }
+
+    public void AddAnsweredQuestion(Guid id, string questionId)
+    {
+        lock (_games)
+        {
+            if (!_games.TryGetValue(id, out var game))
+                throw new KeyNotFoundException($"Game with ID '{id}' was not found.");
+
+            if (!game.AnsweredQuestionIds.Contains(questionId))
+                game.AnsweredQuestionIds.Add(questionId);
+        }
+    }
 }

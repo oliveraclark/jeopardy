@@ -8,4 +8,5 @@ public interface IGameRepository
     Game? GetByPin(string pin);
     void Add(Game game);
     bool AddContestant(Game game, Contestant contestant);
+    void AddAnsweredQuestion(Guid id, string questionId);
 }
