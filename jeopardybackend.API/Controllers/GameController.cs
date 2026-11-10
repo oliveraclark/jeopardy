@@ -44,7 +44,7 @@ public class GamesController : ControllerBase
         }
         return Ok(new GetGameResponse(game.Id,
             game.Pin,
-            game.Status.ToString(),
+            game.BuzzerStatus.ToString(),
             game.Contestants,
             game.AnsweredQuestionIds
         ));
@@ -133,6 +133,26 @@ public class GamesController : ControllerBase
             .SendAsync("ScoreChange", contestant.Id, request.Score, request.QuestionId);
 
         return Ok();
+    }
+
+    [HttpPatch("{pin:int}")]
+    public async Task<IActionResult> SwitchBuzzers(int pin, [FromBody] SwitchBuzzersRequest request)
+    {
+        var game = _gameService.GetGameByPin(pin.ToString());
+
+        if(game == null)
+        {
+            return NotFound("Game not found");
+        }
+
+        _gameService.SwitchBuzzerStatus(pin.ToString(), request.BuzzerStatus, request.QuestionId);
+
+        await _hubContext.Clients
+            .Group(pin.ToString())
+            .SendAsync("BuzzersChanged", request.QuestionId);
+
+        return Ok();
+
     }
 
 

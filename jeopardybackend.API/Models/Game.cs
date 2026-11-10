@@ -12,16 +12,17 @@ public class Game
 
     public DateTime CreatedAt { get; set; }
 
-    public GameStatus Status { get; set; }
+    public BuzzerStatus BuzzerStatus { get; set; } = BuzzerStatus.NotActive;
 
     public List<Contestant> Contestants { get; set; } = new();
 
     public List<string> AnsweredQuestionIds { get; set; } = new List<string>();
+
+    public string? SelectedQuestionId { get; set; } = null;
 }
 
-public enum GameStatus
+public enum BuzzerStatus
 {
-    Waiting,
-    InProgress,
-    Finished
+    Active,
+    NotActive
 }

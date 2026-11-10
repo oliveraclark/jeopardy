@@ -10,10 +10,10 @@ import Buzzer from '../components/common/Buzzer';
 
 import { gameTiles } from '../data/question.data';
 import { Contestant } from '../data/contestants.data';
-import { GameQuestion, GameState } from '../types/game.types';
+import { BuzzerStatus, GameQuestion, GameState } from '../types/game.types';
 
 import { recordAnsweredQuestion } from '../services/contestantService';
-import { getGame } from '../services/gameService';
+import { getGame, switchBuzzers } from '../services/gameService';
 import { useGameState } from '../hooks/useGameState';
 import * as signalR from "@microsoft/signalr";
 
@@ -26,7 +26,7 @@ function Game() {
         selectedQuestion,
         gameState,
         updateGameState,
-        selectQuestion,
+        selectQuestionById,
         updateContestantScore,
         markQuestionAnswered,
         addContestantToState
@@ -70,7 +70,8 @@ function Game() {
                         ...question,
                         answered: fetchedGame.answeredQuestionIds.includes(question.id)
                     })),
-                    selectedQuestionId: null
+                    selectedQuestionId: null,
+                    buzzerStatus: BuzzerStatus.NotActive
                 };
 
                 updateGameState(loadedGameState);
@@ -102,6 +103,10 @@ function Game() {
                             if (score > 0) markQuestionAnswered(questionId);
                         }
                     );
+
+                    connection.on('BuzzersChanged', (questionId: string | null) => {
+                        selectQuestionById(questionId);
+                    });
                 }
                 
 
@@ -176,6 +181,19 @@ function Game() {
         }
     }
 
+    async function handleSelectQuestion(question: GameQuestion | null) {
+        const questionId = question ? question.id : null;
+
+        selectQuestionById(questionId);
+
+        if (pin && gameState) {
+            const response = await switchBuzzers(pin, gameState.buzzerStatus, questionId);
+            if (!response.ok) {
+                throw new Error('Failed to open buzzers question');
+            }
+        }
+    }
+
     if (!gameState) {
         return <Box
             sx={{
@@ -191,22 +209,22 @@ function Game() {
         </Box>
     }
 
-    // if(!isHost) {
-    //     return (
-    //         <Box
-    //         sx={{
-    //             display: 'flex',
-    //             flexDirection: 'column',
-    //             gap: 10,
-    //             justifyContent: 'center',
-    //             alignItems: 'center',
-    //             height: '100vh'
-    //         }}
-    //     >
-    //         <Buzzer></Buzzer>
-    //     </Box>
-    //     )
-    // }
+    if(!isHost) {
+        return (
+            <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh'
+            }}
+        >
+            <Buzzer question={selectedQuestion} status={gameState?.buzzerStatus}></Buzzer>
+        </Box>
+        )
+    }
 
     return (
         <Box
@@ -223,13 +241,13 @@ function Game() {
 
             <GameBoard
                 questions={gameState.gameQuestions}
-                onSelectQuestion={selectQuestion}
+                onSelectQuestion={handleSelectQuestion}
             />
 
             {selectedQuestion && (
                 <QuestionDialogue
                     question={selectedQuestion}
-                    setQuestion={selectQuestion}
+                    setQuestion={handleSelectQuestion}
                     onSubmit={submitAnswer}
                     contestants={gameState.contestants}
                 />

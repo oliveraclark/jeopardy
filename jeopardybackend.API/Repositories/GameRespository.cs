@@ -55,4 +55,16 @@ public class GameRepository : IGameRepository
                 game.AnsweredQuestionIds.Add(questionId);
         }
     }
+
+    public void ChangeBuzzerStatus(Guid id, BuzzerStatus buzzerStatus, string? questionId)
+    {
+        lock (_games)
+        {
+            if (!_games.TryGetValue(id, out var game))
+                throw new KeyNotFoundException($"Game with ID '{id}' was not found.");
+
+            game.BuzzerStatus = buzzerStatus;
+            game.SelectedQuestionId = questionId;
+        }
+    }
 }

@@ -1,5 +1,4 @@
-using System.Security.Cryptography.X509Certificates;
-
+using Jeopardy.API.Models;
 public record CreateContestantRequest(
     string name
 );
@@ -15,6 +14,12 @@ public class AddScoreRequest
     public Guid Id { get; set; }
     public int Score { get; set; }
     public string QuestionId { get; set; } = string.Empty;
+}
+
+public class SwitchBuzzersRequest
+{
+    public BuzzerStatus BuzzerStatus { get; set; }
+    public string? QuestionId { get; set; } = null;
 }
 
 

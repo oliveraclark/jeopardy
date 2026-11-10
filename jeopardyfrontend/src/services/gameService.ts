@@ -1,4 +1,5 @@
 import { Contestant } from "@/data/contestants.data";
+import { BuzzerStatus } from "@/types/game.types";
 const API_URL = "http://localhost:5238/api";
 
 export interface CreateGameResponse {
@@ -36,4 +37,18 @@ export async function getGame(gamePin: string): Promise<GetGameResponse> {
     }
 
     return response.json();
+}
+
+export async function switchBuzzers(gamePin: string, status: BuzzerStatus, questionId: string | null): Promise<Response> {
+    const response = await fetch(`${API_URL}/games/${encodeURIComponent(gamePin)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: status, questionId: questionId })
+    });
+
+    if (!response.ok) {
+        throw new Error("Game not found");
+    }
+
+    return response;
 }

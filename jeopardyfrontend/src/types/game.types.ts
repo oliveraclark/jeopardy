@@ -6,6 +6,11 @@ export enum QuestionType {
     Film = 'Film',
 }
 
+export enum BuzzerStatus {
+    NotActive = 'NotActive',
+    Active = 'Active'
+}
+
 export interface GameQuestion {
     id: string;
     questionType: QuestionType;
@@ -21,4 +26,5 @@ export interface GameState {
     contestants: Contestant[]
     gameQuestions: GameQuestion[]
     selectedQuestionId: string | null
+    buzzerStatus: BuzzerStatus
 }

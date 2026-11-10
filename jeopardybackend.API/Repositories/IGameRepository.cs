@@ -9,4 +9,5 @@ public interface IGameRepository
     void Add(Game game);
     bool AddContestant(Game game, Contestant contestant);
     void AddAnsweredQuestion(Guid id, string questionId);
+    void ChangeBuzzerStatus(Guid id, BuzzerStatus buzzerStatus, string? questionId);
 }

@@ -1,6 +1,6 @@
 
 import { useCallback, useState } from "react";
-import { GameState, GameQuestion } from "../types/game.types";
+import { GameState, GameQuestion, BuzzerStatus } from "../types/game.types";
 import { Contestant } from "../data/contestants.data";
 
 export function useGameState() {
@@ -10,13 +10,17 @@ export function useGameState() {
         setGameState(newState);
     }, []);
 
-    const selectQuestion = useCallback((question: GameQuestion | null) => {
+    const selectQuestionById = useCallback((questionId: string | null) => {
         setGameState(current => {
             if (!current) return current;
 
+            const question =
+                current.gameQuestions.find(q => q.id === questionId) ?? null;
+
             return {
                 ...current,
-                selectedQuestionId: question?.id ?? null
+                selectedQuestionId: question?.id ?? null,
+                buzzerStatus: question ? BuzzerStatus.Active : BuzzerStatus.NotActive
             };
         });
     }, []);
@@ -89,9 +93,9 @@ export function useGameState() {
         gameState,
         selectedQuestion,
         updateGameState,
-        selectQuestion,
         updateContestantScore,
         markQuestionAnswered,
-        addContestantToState
+        addContestantToState,
+        selectQuestionById
     };
 }

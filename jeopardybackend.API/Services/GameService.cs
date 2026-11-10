@@ -34,7 +34,7 @@ namespace Jeopardy.API.Services
                 Id = Guid.NewGuid(),
                 Pin = pin,
                 CreatedAt = DateTime.UtcNow,
-                Status = GameStatus.Waiting
+                BuzzerStatus = BuzzerStatus.NotActive
             };
 
             _repository.Add(game);
@@ -70,10 +70,22 @@ namespace Jeopardy.API.Services
 
             if(game == null)
             {
-                throw new Exception("Not Found, how did you get here?!");
+                throw new Exception("Not Found, how did you get here?! Stop trying to hack me or else");
             }
             
             _repository.AddAnsweredQuestion(game.Id, questionId);
+        }
+
+        public void SwitchBuzzerStatus(string pin, BuzzerStatus buzzerStatus, string? questionId)
+        {
+            var game = GetGameByPin(pin);
+
+            if(game == null)
+            {
+                throw new Exception("Not Found, how did you get here?! Stop trying to hack me or else");
+            }
+
+            _repository.ChangeBuzzerStatus(game.Id, buzzerStatus, questionId);
         }
     }
 }
